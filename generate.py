@@ -79,6 +79,79 @@ GENERATORS = {
         "default_size": 80,
         "description": "Weekly market prices (80 markets × 104 weeks × 8 commodities)",
     },
+    # ── Sector-specific generators ──
+    "gender_programme": {
+        "module": "generators.gender_programme",
+        "size_param": "n_individuals",
+        "default_size": 25000,
+        "description": "Gender programme (empowerment, GBV, decision-making, SRH)",
+    },
+    "girls_education": {
+        "module": "generators.girls_education",
+        "size_param": "n_girls",
+        "default_size": 20000,
+        "description": "Girls' education (enrollment, MHM, safety, barriers, transition)",
+    },
+    "climate_resilience": {
+        "module": "generators.climate_resilience",
+        "size_param": "n_households",
+        "default_size": 20000,
+        "description": "Climate & resilience (shocks, coping, adaptation, RIMA index)",
+    },
+    "agri_value_chain": {
+        "module": "generators.agri_value_chain",
+        "size_param": "n_transactions",
+        "default_size": 25000,
+        "description": "Agriculture value chain (farm→market, margins, quality, PHL)",
+    },
+    "animal_welfare": {
+        "module": "generators.animal_welfare",
+        "size_param": "n_records",
+        "default_size": 15000,
+        "description": "Animal welfare (Five Freedoms, BCS, vet access, working animals)",
+    },
+    "public_health": {
+        "module": "generators.public_health",
+        "size_param": "n_individuals",
+        "default_size": 20000,
+        "description": "Public health (disease surveillance, CHW, insurance, mental health)",
+    },
+    "livelihoods": {
+        "module": "generators.livelihoods",
+        "size_param": "n_households",
+        "default_size": 20000,
+        "description": "Livelihoods (VSLA, enterprise, financial inclusion, FCS, assets)",
+    },
+    "advocacy_rights": {
+        "module": "generators.advocacy_rights",
+        "size_param": "n_individuals",
+        "default_size": 15000,
+        "description": "Advocacy & rights (legal aid, tenure, justice, civic space)",
+    },
+    "wash": {
+        "module": "generators.wash",
+        "size_param": "n_households",
+        "default_size": 18000,
+        "description": "WASH (JMP ladders, water quality, sanitation, hygiene, diarrhea)",
+    },
+    "humanitarian": {
+        "module": "generators.humanitarian",
+        "size_param": "n_individuals",
+        "default_size": 18000,
+        "description": "Humanitarian response (displacement, needs, aid, protection, CwC)",
+    },
+    "social_protection": {
+        "module": "generators.social_protection",
+        "size_param": "n_households",
+        "default_size": 20000,
+        "description": "Social protection (cash transfers, conditionality, graduation)",
+    },
+    "governance": {
+        "module": "generators.governance",
+        "size_param": "n_citizens",
+        "default_size": 15000,
+        "description": "Governance & accountability (service delivery, corruption, trust)",
+    },
 }
 
 
