@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevData Practice — Realistic Datasets for Development Economics</title>
+  <meta name="description" content="10 generators producing large, realistic practice datasets for development economics: household surveys, RCTs, health, education, agriculture, labor markets, and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-bg: #FFFFFF;
+      --secondary-bg: #F8FAFC;
+      --accent-color: #0EA5E9;
+      --accent-hover: #0284C7;
+      --secondary-accent: #6366F1;
+      --success-color: #10B981;
+      --warning-color: #F59E0B;
+      --danger-color: #EF4444;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --card-bg: #FFFFFF;
+      --hover-bg: #F1F5F9;
+      --border-color: #E2E8F0;
+      --code-bg: #F1F5F9;
+      --gradient-primary: linear-gradient(135deg, #0EA5E9 0%, #6366F1 100%);
+      --gradient-accent: linear-gradient(135deg, #0EA5E9 0%, #10B981 100%);
+      --nav-bg: rgba(255, 255, 255, 0.95);
+      --nav-text: #0F172A;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    body.dark-mode {
+      --primary-bg: #0F172A;
+      --secondary-bg: #1E293B;
+      --text-primary: #F1F5F9;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --card-bg: #1E293B;
+      --hover-bg: #334155;
+      --border-color: #334155;
+      --code-bg: #1E293B;
+      --nav-bg: rgba(15, 23, 42, 0.95);
+      --nav-text: #F1F5F9;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+      --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--primary-bg);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+      animation: pageFadeIn 0.4s ease-out;
+    }
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--primary-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    html { scroll-behavior: smooth; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 1000;
+      background: var(--nav-bg);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 1.5rem; transition: background 0.3s;
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; height: 64px;
+    }
+    .logo {
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.1rem;
+      color: var(--text-primary); text-decoration: none;
+    }
+    .logo span { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .nav-right { display: flex; align-items: center; gap: 24px; }
+    .nav-links { display: flex; gap: 24px; list-style: none; }
+    .nav-links a {
+      color: var(--text-secondary); text-decoration: none; font-size: 0.85rem;
+      font-weight: 500; transition: color 0.2s; text-transform: uppercase; letter-spacing: 0.02em;
+    }
+    .nav-links a:hover { color: var(--accent-color); }
+    .theme-selector {
+      display: flex; gap: 4px; background: var(--secondary-bg);
+      border: 1px solid var(--border-color); border-radius: 10px; padding: 3px;
+    }
+    .theme-btn {
+      width: 34px; height: 34px; border: none; border-radius: 8px;
+      background: transparent; cursor: pointer; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; color: var(--text-muted);
+    }
+    .theme-btn:hover { background: var(--hover-bg); }
+    .theme-btn.active { background: var(--accent-color); color: #fff; box-shadow: var(--shadow-sm); }
+    .mobile-toggle {
+      display: none; width: 44px; height: 44px; border: none; background: none;
+      cursor: pointer; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+    }
+    .mobile-toggle span { width: 22px; height: 2px; background: var(--text-primary); border-radius: 2px; }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-toggle { display: flex; }
+      .nav-links.open {
+        display: flex; flex-direction: column; position: absolute; top: 64px; left: 0; right: 0;
+        background: var(--nav-bg); backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-color); padding: 16px 24px; gap: 16px; z-index: 999;
+      }
+    }
+
+    /* HERO */
+    .hero {
+      position: relative; padding: 100px 0 80px; text-align: center; overflow: hidden;
+      background: var(--primary-bg); transition: background 0.3s;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    body.dark-mode .hero::before {
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: 100px; font-size: 0.8rem; font-weight: 500;
+      color: var(--text-secondary); margin-bottom: 28px; box-shadow: var(--shadow-sm);
+    }
+    .hero-badge .dot { width: 6px; height: 6px; background: var(--success-color); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .hero h1 {
+      font-family: 'Poppins', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 20px;
+    }
+    .hero h1 .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 660px; margin: 0 auto 36px; line-height: 1.8; }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.75rem 2rem; border-radius: var(--radius-sm);
+      font-size: 0.9rem; font-weight: 600; text-decoration: none;
+      transition: all 0.2s; border: none; cursor: pointer;
+    }
+    .btn-primary { background: var(--gradient-primary); color: #fff; box-shadow: var(--shadow-md); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .btn-secondary { background: var(--card-bg); color: var(--text-primary); border: 2px solid var(--border-color); }
+    .btn-secondary:hover { border-color: var(--accent-color); transform: translateY(-2px); }
+    .btn svg { width: 18px; height: 18px; }
+
+    /* STATS */
+    .stats {
+      display: flex; justify-content: center; gap: 48px; padding: 40px 0;
+      border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
+      margin-bottom: 80px; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-value {
+      font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 700;
+      background: var(--gradient-primary); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+
+    /* SECTIONS */
+    section { padding: 4rem 0; }
+    .section-alt { background: var(--secondary-bg); transition: background 0.3s; }
+    .section-header { text-align: center; margin-bottom: 48px; }
+    .section-header h2 { font-family: 'Poppins', sans-serif; font-size: 2.25rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+    .section-header p { color: var(--text-secondary); font-size: 1.05rem; max-width: 620px; margin: 0 auto; }
+
+    /* DATASET CARDS */
+    .dataset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+    .dataset-card {
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: var(--radius); overflow: hidden; transition: all 0.25s;
+      box-shadow: var(--shadow-sm);
+    }
+    .dataset-card::before {
+      content: ''; display: block; height: 3px;
+      background: var(--gradient-primary); opacity: 0; transition: opacity 0.3s;
+    }
+    .dataset-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent-color); }
+    .dataset-card:hover::before { opacity: 1; }
+    .dataset-card-inner { padding: 24px 28px 28px; }
+    .dataset-card h3 { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+    .dataset-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+    .dataset-card p { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.7; margin-bottom: 14px; }
+    .features { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      font-size: 0.72rem; padding: 4px 10px; background: var(--secondary-bg);
+      border: 1px solid var(--border-color); border-radius: 6px;
+      color: var(--text-muted); font-weight: 500;
+    }
+
+    /* DETAILS */
+    .app-doc {
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: var(--radius); margin-bottom: 16px; box-shadow: var(--shadow-sm);
+      overflow: hidden; transition: all 0.25s;
+    }
+    .app-doc:hover { box-shadow: var(--shadow-md); }
+    .app-doc summary {
+      padding: 20px 28px; cursor: pointer; display: flex; align-items: center; gap: 16px;
+      font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1rem;
+      list-style: none; transition: background 0.2s; color: var(--text-primary);
+    }
+    .app-doc summary::-webkit-details-marker { display: none; }
+    .app-doc summary::before {
+      content: ''; width: 20px; height: 20px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'/%3E%3C/svg%3E") no-repeat center;
+      flex-shrink: 0; transition: transform 0.2s;
+    }
+    .app-doc[open] summary::before { transform: rotate(90deg); }
+    .app-doc summary:hover { background: var(--hover-bg); }
+    .badge-row { display: flex; gap: 8px; margin-left: auto; }
+    .doc-body { padding: 0 28px 28px; border-top: 1px solid var(--border-color); }
+    .doc-body h4 { font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 600; margin: 20px 0 8px; }
+    .doc-body p, .doc-body li { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.75; }
+    .doc-body ul { padding-left: 20px; margin: 8px 0; }
+    .doc-body li { margin-bottom: 4px; }
+    .size-badge {
+      display: inline-flex; padding: 3px 10px; border-radius: 6px; font-size: 0.72rem;
+      font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+      background: rgba(14, 165, 233, 0.1); color: var(--accent-color);
+    }
+
+    /* CODE */
+    pre {
+      background: var(--code-bg); border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm); padding: 18px 20px; overflow-x: auto;
+      margin: 12px 0; transition: background 0.3s;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+      line-height: 1.7; color: var(--text-secondary);
+    }
+    code .comment { color: var(--text-muted); }
+    code .cmd { color: var(--accent-color); }
+    code .flag { color: var(--warning-color); }
+    code .string { color: var(--secondary-accent); }
+    p code, li code, td code {
+      background: var(--code-bg); padding: 2px 6px; border-radius: 4px;
+      font-size: 0.84em; border: 1px solid var(--border-color);
+    }
+
+    /* SETUP */
+    .setup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 24px; }
+    @media (max-width: 560px) { .setup-grid { grid-template-columns: 1fr; } }
+    .setup-card {
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow-sm); transition: all 0.25s;
+    }
+    .setup-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .setup-card h3 {
+      font-family: 'Poppins', sans-serif; font-size: 1.15rem; font-weight: 600;
+      margin-bottom: 8px; display: flex; align-items: center; gap: 10px;
+    }
+    .setup-card h3 .num {
+      width: 28px; height: 28px; background: var(--gradient-primary); color: #fff;
+      border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+    }
+    .setup-card > p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 18px; }
+
+    /* EXERCISES TABLE */
+    .exercise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px; }
+    .exercise-card {
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm); transition: all 0.2s;
+    }
+    .exercise-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .exercise-card h4 { font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; }
+    .exercise-card p { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.7; }
+    .exercise-card .dataset-ref { font-size: 0.78rem; color: var(--accent-color); font-weight: 600; margin-top: 8px; }
+    .diff-badge {
+      display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;
+      font-weight: 600; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .diff-intro { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+    .diff-inter { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+    .diff-adv { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+
+    /* FOOTER */
+    footer {
+      margin-top: 40px; padding: 40px 0; border-top: 1px solid var(--border-color);
+      text-align: center; font-size: 0.85rem; background: var(--secondary-bg); transition: background 0.3s;
+    }
+    footer p { margin: 6px 0; color: var(--text-muted); }
+    footer a { color: var(--accent-color); text-decoration: none; font-weight: 500; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 640px) {
+      .hero { padding: 60px 0 50px; }
+      .stats { gap: 24px; }
+      .dataset-grid { grid-template-columns: 1fr; }
+      .section-header h2 { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">dev<span>data</span> practice</a>
+    <div class="nav-right">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#datasets">Datasets</a></li>
+        <li><a href="#getting-started">Get Started</a></li>
+        <li><a href="#documentation">Docs</a></li>
+        <li><a href="#exercises">Exercises</a></li>
+        <li><a href="https://github.com/Varnasr/devdata-practice" target="_blank">GitHub</a></li>
+      </ul>
+      <div class="theme-selector">
+        <button class="theme-btn" data-theme="light" title="Light mode" aria-label="Light mode">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <button class="theme-btn" data-theme="system" title="System preference" aria-label="System preference">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </button>
+        <button class="theme-btn" data-theme="dark" title="Dark mode" aria-label="Dark mode">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container">
+    <div class="hero-badge"><span class="dot"></span> Open Source &middot; MIT License</div>
+    <h1>Practice datasets for<br><span class="gradient-text">development economics</span></h1>
+    <p>
+      10 generators producing large, realistic datasets for impact evaluation, poverty analysis,
+      health, education, agriculture, labor markets, and more. Built for students and practitioners
+      learning data work in global development.
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/Varnasr/devdata-practice" class="btn btn-primary" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        View on GitHub
+      </a>
+      <a href="#getting-started" class="btn btn-secondary">Get Started</a>
+      <a href="https://impactmojo.in" class="btn btn-secondary" target="_blank">Impact Mojo</a>
+    </div>
+  </div>
+</header>
+
+<!-- STATS -->
+<div class="container">
+  <div class="stats">
+    <div class="stat"><div class="stat-value">10</div><div class="stat-label">Generators</div></div>
+    <div class="stat"><div class="stat-value">350k+</div><div class="stat-label">Rows Per Run</div></div>
+    <div class="stat"><div class="stat-value">250+</div><div class="stat-label">Variables</div></div>
+    <div class="stat"><div class="stat-value">25</div><div class="stat-label">Countries</div></div>
+    <div class="stat"><div class="stat-value">MIT</div><div class="stat-label">License</div></div>
+  </div>
+</div>
+
+<!-- DATASETS -->
+<section id="datasets">
+  <div class="container">
+    <div class="section-header">
+      <h2>The Datasets</h2>
+      <p>Each generator produces a large, realistic dataset with correlated variables, proper distributions, and realistic missing-data patterns.</p>
+    </div>
+    <div class="dataset-grid">
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>Household Survey</h3>
+        <div class="dataset-meta">~75k rows &middot; 27 cols &middot; LSMS-style</div>
+        <p>Multi-module household survey with demographics, per-capita consumption (log-normal), asset ownership, housing quality, food security (FIES), and subjective well-being. Individual-level (members nested in households).</p>
+        <div class="features"><span class="tag">Engel curves</span><span class="tag">Asset index</span><span class="tag">MNAR missingness</span><span class="tag">Intra-HH correlation</span></div>
+      </div></div>
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>RCT Experiment</h3>
+        <div class="dataset-meta">25k rows &middot; 15 cols &middot; Multi-arm trial</div>
+        <p>Randomized controlled trial with stratified assignment, 4 treatment arms, partial compliance, differential attrition, and spillover flags. Baseline + endline consumption and food insecurity.</p>
+        <div class="features"><span class="tag">Stratification</span><span class="tag">Compliance</span><span class="tag">Attrition</span><span class="tag">Spillovers</span><span class="tag">Lee bounds</span></div>
+      </div></div>
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>Panel Data</h3>
+        <div class="dataset-meta">625 rows &middot; 21 cols &middot; 25 countries × 25 years</div>
+        <p>Balanced country-year panel with 20+ development indicators including GDP, life expectancy, mortality, enrollment, fertility, poverty, and Gini. AR(1) persistence, COVID shock, WDI-like gaps.</p>
+        <div class="features"><span class="tag">Cross-indicator correlation</span><span class="tag">Structural breaks</span><span class="tag">Sparse missingness</span></div>
+      </div></div>
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>Agricultural Survey</h3>
+        <div class="dataset-meta">~31k rows &middot; 27 cols &middot; Plot-level</div>
+        <p>Plot-level crop production data with Cobb-Douglas yields, input use (fertilizer, improved seed, irrigation), rainfall shocks, distance to market, and profit calculation.</p>
+        <div class="features"><span class="tag">Cobb-Douglas</span><span class="tag">Weather shocks</span><span class="tag">Technology adoption</span><span class="tag">Market access</span></div>
+      </div></div>
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>Health &amp; Nutrition</h3>
+        <div class="dataset-meta">35k rows &middot; 34 cols &middot; DHS-style</div>
+        <p>Under-5 child health data with WHO z-scores (HAZ/WAZ/WHZ), vaccination schedules, maternal health (ANC, delivery), feeding practices, morbidity, and age heaping.</p>
+        <div class="features"><span class="tag">Anthropometrics</span><span class="tag">Vaccination</span><span class="tag">Wealth gradient</span><span class="tag">Age heaping</span></div>
+      </div></div>
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>Education Outcomes</h3>
+        <div class="dataset-meta">~30k rows &middot; 23 cols &middot; Multi-level</div>
+        <p>Student-level data nested in 500 schools with math/reading scores, attendance, teacher quality, school resources, SES, grade repetition, and dropout. ICC ~0.20.</p>
+        <div class="features"><span class="tag">Multi-level</span><span class="tag">Gender gaps</span><span class="tag">School effects</span><span class="tag">Dropout</span></div>
+      </div></div>
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>Labor Market</h3>
+        <div class="dataset-meta">40k rows &middot; 24 cols &middot; Labor force survey</div>
+        <p>Working-age adults with Mincer wage equation, formal/informal sector, employment status, hours, migration, remittances, social protection, and underemployment.</p>
+        <div class="features"><span class="tag">Mincer returns</span><span class="tag">Gender gap</span><span class="tag">Formality</span><span class="tag">Migration</span></div>
+      </div></div>
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>Microfinance</h3>
+        <div class="dataset-meta">30k rows &middot; 28 cols &middot; MFI loan records</div>
+        <p>Loan-level records with group/individual lending, repayment rates, default prediction, repeat borrowers, collateral, and internal credit scoring. Realistic MFI portfolio.</p>
+        <div class="features"><span class="tag">Group lending</span><span class="tag">Default risk</span><span class="tag">Repeat borrowers</span><span class="tag">Credit scoring</span></div>
+      </div></div>
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>Program Targeting</h3>
+        <div class="dataset-meta">20k rows &middot; 37 cols &middot; PMT data</div>
+        <p>Proxy means test targeting with true vs. predicted consumption, inclusion/exclusion errors, community-based targeting comparison, and categorical eligibility. Ready for targeting accuracy analysis.</p>
+        <div class="features"><span class="tag">PMT score</span><span class="tag">Type I/II errors</span><span class="tag">Community targeting</span><span class="tag">Benefit calc</span></div>
+      </div></div>
+      <div class="dataset-card"><div class="dataset-card-inner">
+        <h3>Trade &amp; Market Prices</h3>
+        <div class="dataset-meta">~67k rows &middot; 10 cols &middot; 80 markets × 104 weeks</div>
+        <p>Weekly staple commodity prices across 80 markets in 16 countries with seasonality, spatial price correlation, transport cost wedges, border effects, and AR(1) persistence.</p>
+        <div class="features"><span class="tag">Seasonality</span><span class="tag">Spatial correlation</span><span class="tag">Border effects</span><span class="tag">Cointegration</span></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- GETTING STARTED -->
+<section id="getting-started" class="section-alt">
+  <div class="container">
+    <div class="section-header">
+      <h2>Getting Started</h2>
+      <p>Generate all datasets in under 30 seconds. Only requires Python 3.8+ and four pip packages.</p>
+    </div>
+    <div class="setup-grid">
+      <div class="setup-card">
+        <h3><span class="num">1</span> Install &amp; Generate All</h3>
+        <p>Clone the repo, install dependencies, and generate all 10 datasets as CSV files.</p>
+        <pre><code><span class="comment"># Clone</span>
+<span class="cmd">git clone</span> https://github.com/Varnasr/devdata-practice.git
+<span class="cmd">cd</span> devdata-practice
+
+<span class="comment"># Install (numpy, pandas, scipy, pyarrow)</span>
+<span class="cmd">pip install</span> <span class="flag">-r</span> requirements.txt
+
+<span class="comment"># Generate all 10 datasets</span>
+<span class="cmd">python</span> generate.py</code></pre>
+        <p style="margin-top: 12px; font-size: 0.85rem;">Outputs ~35 MB of CSVs to <code>./output/</code></p>
+      </div>
+      <div class="setup-card">
+        <h3><span class="num">2</span> Customize</h3>
+        <p>Generate specific datasets, change sizes, set seeds for reproducibility, or export as Parquet.</p>
+        <pre><code><span class="comment"># Generate just two datasets</span>
+<span class="cmd">python</span> generate.py rct_experiment labor_market
+
+<span class="comment"># Larger datasets (override default size)</span>
+<span class="cmd">python</span> generate.py household_survey <span class="flag">--rows</span> 50000
+
+<span class="comment"># Set seed for exact reproducibility</span>
+<span class="cmd">python</span> generate.py <span class="flag">--seed</span> 42
+
+<span class="comment"># Export as Parquet instead of CSV</span>
+<span class="cmd">python</span> generate.py <span class="flag">--format</span> parquet
+
+<span class="comment"># List all available generators</span>
+<span class="cmd">python</span> generate.py <span class="flag">--list</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCUMENTATION -->
+<section id="documentation">
+  <div class="container">
+    <div class="section-header">
+      <h2>Documentation</h2>
+      <p>Expand any dataset below for the full column dictionary, realistic features, and methodological notes.</p>
+    </div>
+
+    <details class="app-doc">
+      <summary>Household Survey (LSMS-style)<div class="badge-row"><span class="size-badge">~75k rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>One row per household member. ~15,000 households with 2-8 members each, expanded to ~75k individual-level rows. Household-level variables are repeated across members.</p>
+        <h4>Key Columns</h4>
+        <ul>
+          <li><code>individual_id</code>, <code>household_id</code> — Unique identifiers</li>
+          <li><code>country</code>, <code>district</code>, <code>urban</code> — Geography</li>
+          <li><code>relationship</code>, <code>age</code>, <code>female</code>, <code>education_years</code> — Demographics</li>
+          <li><code>monthly_pce_usd</code> — Monthly per-capita expenditure (USD PPP, log-normal)</li>
+          <li><code>food_share</code> — Engel curve: food expenditure as share of total</li>
+          <li><code>food_insecurity_score</code> — FIES-like 0-8 scale</li>
+          <li><code>owns_radio</code> through <code>owns_improved_stove</code> — 8 binary asset indicators</li>
+          <li><code>wall_material</code>, <code>rooms</code>, <code>water_source</code>, <code>toilet_type</code> — Housing</li>
+          <li><code>life_satisfaction</code> — Subjective well-being (1-10)</li>
+        </ul>
+        <h4>Realistic Features</h4>
+        <ul>
+          <li>Latent wealth factor drives correlated consumption, assets, and housing</li>
+          <li>Engel curve: food share declines with wealth (0.70 base, -0.08 per SD)</li>
+          <li>Urban premium on wealth (+0.6 SD)</li>
+          <li>MNAR missingness: richer households less likely to report income</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="app-doc">
+      <summary>RCT Experiment<div class="badge-row"><span class="size-badge">25k rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>One row per participant. 4 arms: control, cash transfer, cash + training, training only. Stratified by district &times; gender.</p>
+        <h4>Key Columns</h4>
+        <ul>
+          <li><code>treatment_arm</code> — Randomized assignment</li>
+          <li><code>actually_treated</code> — Compliance indicator (65-85% take-up)</li>
+          <li><code>baseline_consumption_usd</code>, <code>endline_consumption_usd</code> — Primary outcomes</li>
+          <li><code>baseline_food_insecurity</code>, <code>endline_food_insecurity</code> — HFIAS 0-27</li>
+          <li><code>attrited</code> — Endline attrition (differential by arm)</li>
+          <li><code>spillover_risk</code> — Flag for control units in treated villages</li>
+        </ul>
+        <h4>Embedded Effects</h4>
+        <ul>
+          <li>Cash: +15%, Cash+Training: +22%, Training: +8% consumption increase</li>
+          <li>Heterogeneous effects: larger for women and poorer baseline</li>
+          <li>Attrition: 8% base + 3% higher in control + rural premium</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="app-doc">
+      <summary>Panel Data (WDI-style)<div class="badge-row"><span class="size-badge">625 rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>Balanced panel: 25 developing countries &times; 25 years (2000-2024). 20+ indicators per country-year.</p>
+        <h4>Key Columns</h4>
+        <ul>
+          <li><code>gdp_per_capita_usd</code>, <code>log_gdp_per_capita</code> — Income</li>
+          <li><code>life_expectancy</code>, <code>infant_mortality_per_1000</code>, <code>under5_mortality_per_1000</code> — Health</li>
+          <li><code>primary_enrollment_pct</code>, <code>secondary_enrollment_pct</code>, <code>adult_literacy_pct</code> — Education</li>
+          <li><code>fertility_rate</code>, <code>electricity_access_pct</code>, <code>sanitation_access_pct</code> — Development</li>
+          <li><code>poverty_headcount_215</code>, <code>gini_coefficient</code> — Welfare (sparse)</li>
+        </ul>
+        <h4>Realistic Features</h4>
+        <ul>
+          <li>AR(1) shock persistence + country-specific growth trends</li>
+          <li>COVID-2020 GDP shock (-8%) and 2021 partial recovery</li>
+          <li>WDI-like missingness: poverty and Gini ~30% missing, GDP near-complete</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="app-doc">
+      <summary>Agricultural Survey<div class="badge-row"><span class="size-badge">~31k rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>One row per plot. ~15k farm households with 1-4 plots each. 7 crops, full input-output accounting.</p>
+        <h4>Key Columns</h4>
+        <ul>
+          <li><code>plot_size_acres</code>, <code>crop</code>, <code>soil_quality</code> — Plot characteristics</li>
+          <li><code>improved_seed</code>, <code>fertilizer_kg</code>, <code>irrigation</code>, <code>pesticide_used</code> — Inputs</li>
+          <li><code>rainfall_deviation_sd</code> — Weather shock (SD from normal)</li>
+          <li><code>harvest_kg</code>, <code>price_per_kg_usd</code>, <code>revenue_usd</code>, <code>profit_usd</code> — Outputs</li>
+          <li><code>extension_contact</code>, <code>distance_to_market_km</code> — Access</li>
+        </ul>
+        <h4>Production Function</h4>
+        <p>Yields follow a Cobb-Douglas: Y = A &middot; L<sup>0.50</sup> &middot; Lab<sup>0.25</sup> &middot; F<sup>0.15</sup> with TFP shifters for improved seed (+15%), irrigation (+10%), and soil quality. Rainfall has an inverted-U effect.</p>
+      </div>
+    </details>
+
+    <details class="app-doc">
+      <summary>Health &amp; Nutrition (DHS-style)<div class="badge-row"><span class="size-badge">35k rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>One row per child under 5 with linked mother characteristics. Wealth quintile drives most health gradients.</p>
+        <h4>Key Columns</h4>
+        <ul>
+          <li><code>height_for_age_z</code>, <code>weight_for_age_z</code>, <code>weight_for_height_z</code> — WHO z-scores</li>
+          <li><code>stunted</code>, <code>underweight</code>, <code>wasted</code> — Binary flags (z &lt; -2)</li>
+          <li><code>bcg_vaccine</code>, <code>dpt1_vaccine</code>, <code>dpt3_vaccine</code>, <code>measles_vaccine</code>, <code>fully_vaccinated</code></li>
+          <li><code>anc_visits</code>, <code>facility_delivery</code>, <code>skilled_birth_attendant</code> — Maternal health</li>
+          <li><code>diarrhea_2wk</code>, <code>fever_2wk</code>, <code>cough_2wk</code>, <code>sought_treatment</code> — Morbidity</li>
+        </ul>
+        <h4>Realistic Features</h4>
+        <ul>
+          <li>Growth faltering after 6 months (HAZ declines with age)</li>
+          <li>Age-appropriate vaccination (can't get measles before 9 months)</li>
+          <li>Age heaping at 6, 12, 24, 36, 48 months (interviewer rounding)</li>
+          <li>Birth weight MAR: heavier babies more likely to be weighed</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="app-doc">
+      <summary>Education Outcomes<div class="badge-row"><span class="size-badge">~30k rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>Students nested in 500 schools (grades 3-8). Multi-level data for HLM analysis.</p>
+        <h4>Key Columns</h4>
+        <ul>
+          <li><code>math_score</code>, <code>reading_score</code> — 0-100 test scores</li>
+          <li><code>attendance_rate</code>, <code>distance_to_school_km</code> — Student access</li>
+          <li><code>ses_score</code>, <code>school_type</code>, <code>school_meal_program</code> — SES & resources</li>
+          <li><code>pupil_teacher_ratio</code>, <code>pct_trained_teachers</code>, <code>has_library</code> — School quality</li>
+          <li><code>repeated_grade</code>, <code>dropped_out</code> — Persistence</li>
+        </ul>
+        <h4>Embedded Effects</h4>
+        <ul>
+          <li>School random effect (ICC ~0.20): 20% of score variance is between-school</li>
+          <li>Girls outperform in reading (+2 pts), boys in math (+2 pts)</li>
+          <li>Dropout students have missing endline scores (structural missingness)</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="app-doc">
+      <summary>Labor Market<div class="badge-row"><span class="size-badge">40k rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>Working-age adults (15-64) with employment status, wages, sector, and social protection.</p>
+        <h4>Wage Equation (Mincer)</h4>
+        <p><code>ln(wage) = 1.8 + 0.08&middot;educ + 0.04&middot;exp - 0.0006&middot;exp&sup2; - 0.18&middot;female + 0.25&middot;urban + 0.35&middot;formal + &epsilon;</code></p>
+        <ul>
+          <li>8% return to education, concave experience profile</li>
+          <li>18% gender wage gap (suitable for Oaxaca-Blinder decomposition)</li>
+          <li>35% formality premium</li>
+          <li>Employment: wage, self-employed, unpaid family, unemployed</li>
+          <li>Migration and remittances with realistic amounts</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="app-doc">
+      <summary>Microfinance<div class="badge-row"><span class="size-badge">30k rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>Loan-level records from a microfinance institution. Group and individual lending products.</p>
+        <h4>Key Columns</h4>
+        <ul>
+          <li><code>loan_amount_usd</code>, <code>interest_rate_annual_pct</code>, <code>term_months</code> — Terms</li>
+          <li><code>loan_product</code>, <code>loan_purpose</code> — Product classification</li>
+          <li><code>cycle_number</code> — Repeat borrower indicator (graduation)</li>
+          <li><code>defaulted</code>, <code>days_past_due</code>, <code>repayment_rate</code> — Performance</li>
+          <li><code>internal_credit_score</code> — 300-850 score</li>
+        </ul>
+        <h4>Default Model</h4>
+        <p>Default probability via logistic: higher for larger loans, consumption purpose, first-cycle borrowers, uncollateralized. Women default less. Repeat borrowers graduate to larger amounts.</p>
+      </div>
+    </details>
+
+    <details class="app-doc">
+      <summary>Program Targeting (PMT)<div class="badge-row"><span class="size-badge">20k rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>Household-level data with both true consumption (survey) and PMT-predicted consumption. Built for targeting accuracy analysis.</p>
+        <h4>Key Columns</h4>
+        <ul>
+          <li><code>true_monthly_pce_usd</code> — Actual per-capita consumption (with residual noise)</li>
+          <li><code>pmt_predicted_pce_usd</code> — Fitted values from proxy means formula</li>
+          <li><code>truly_poor</code>, <code>pmt_classified_poor</code> — Binary poverty flags</li>
+          <li><code>exclusion_error</code>, <code>inclusion_error</code> — Targeting mistakes</li>
+          <li><code>community_selected</code> — Community-based targeting comparison</li>
+          <li><code>monthly_benefit_usd</code> — Calculated transfer amount</li>
+        </ul>
+        <h4>Why It's Useful</h4>
+        <p>The gap between true and predicted consumption creates realistic targeting errors. Students can compare PMT, community, and categorical targeting; compute leakage and undercoverage; and simulate benefit reforms.</p>
+      </div>
+    </details>
+
+    <details class="app-doc">
+      <summary>Trade &amp; Market Prices<div class="badge-row"><span class="size-badge">~67k rows</span></div></summary>
+      <div class="doc-body">
+        <h4>Structure</h4>
+        <p>80 markets &times; 104 weeks &times; 8 staple commodities. 2 years of weekly price data across 16 countries.</p>
+        <h4>Key Columns</h4>
+        <ul>
+          <li><code>market</code>, <code>country</code>, <code>date</code>, <code>commodity</code> — Identifiers</li>
+          <li><code>price_per_kg_usd</code> — Commodity price with seasonality</li>
+          <li><code>volume_traded_kg</code> — Market volume</li>
+          <li><code>transport_cost_pct</code> — Distance-based cost wedge</li>
+        </ul>
+        <h4>Price Dynamics</h4>
+        <ul>
+          <li>Seasonal cycles: lean-season highs, post-harvest lows</li>
+          <li>AR(1) persistence in price levels</li>
+          <li>Spatial correlation: nearby markets move together</li>
+          <li>Border effect: +8% premium for cross-country market pairs</li>
+          <li>Suitable for cointegration / market integration analysis</li>
+        </ul>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+<!-- EXERCISES -->
+<section id="exercises" class="section-alt">
+  <div class="container">
+    <div class="section-header">
+      <h2>Practice Exercises</h2>
+      <p>Suggested exercises for each dataset, organized by difficulty. Perfect for coursework and self-study.</p>
+    </div>
+    <div class="exercise-grid">
+      <div class="exercise-card">
+        <span class="diff-badge diff-intro">Introductory</span>
+        <h4>Poverty Profile</h4>
+        <p>Using the household survey, calculate headcount poverty rates by district, urban/rural, and household head gender. Plot the Lorenz curve and compute the Gini coefficient.</p>
+        <div class="dataset-ref">Dataset: household_survey</div>
+      </div>
+      <div class="exercise-card">
+        <span class="diff-badge diff-intro">Introductory</span>
+        <h4>Descriptive Health Statistics</h4>
+        <p>Compute stunting, underweight, and wasting prevalence by wealth quintile. Plot vaccination coverage by age. Detect the age heaping pattern.</p>
+        <div class="dataset-ref">Dataset: health_nutrition</div>
+      </div>
+      <div class="exercise-card">
+        <span class="diff-badge diff-inter">Intermediate</span>
+        <h4>ITT &amp; LATE Estimation</h4>
+        <p>Estimate intent-to-treat effects for each arm. Use compliance data to compute LATE via IV/2SLS. Test for differential attrition and compute Lee bounds.</p>
+        <div class="dataset-ref">Dataset: rct_experiment</div>
+      </div>
+      <div class="exercise-card">
+        <span class="diff-badge diff-inter">Intermediate</span>
+        <h4>Mincer Wage Regression</h4>
+        <p>Estimate returns to education and experience. Perform Oaxaca-Blinder decomposition of the gender wage gap. Compare formal vs. informal sector returns.</p>
+        <div class="dataset-ref">Dataset: labor_market</div>
+      </div>
+      <div class="exercise-card">
+        <span class="diff-badge diff-inter">Intermediate</span>
+        <h4>Agricultural Productivity</h4>
+        <p>Estimate the Cobb-Douglas production function. Test for technology adoption effects. Analyze how rainfall shocks affect yields and whether irrigation mitigates damage.</p>
+        <div class="dataset-ref">Dataset: agriculture</div>
+      </div>
+      <div class="exercise-card">
+        <span class="diff-badge diff-inter">Intermediate</span>
+        <h4>Multi-level Education Model</h4>
+        <p>Fit a hierarchical linear model with student and school levels. Estimate the ICC. Test whether school meal programs improve test scores controlling for SES.</p>
+        <div class="dataset-ref">Dataset: education</div>
+      </div>
+      <div class="exercise-card">
+        <span class="diff-badge diff-adv">Advanced</span>
+        <h4>Targeting Accuracy Analysis</h4>
+        <p>Compare PMT, community-based, and categorical targeting. Compute undercoverage, leakage, and total error. Simulate moving the poverty line and observe the error trade-off.</p>
+        <div class="dataset-ref">Dataset: targeting</div>
+      </div>
+      <div class="exercise-card">
+        <span class="diff-badge diff-adv">Advanced</span>
+        <h4>Credit Risk &amp; Default Prediction</h4>
+        <p>Build a logistic regression model predicting default. Compute ROC/AUC. Analyze whether group lending reduces default vs. individual lending, controlling for observables.</p>
+        <div class="dataset-ref">Dataset: microfinance</div>
+      </div>
+      <div class="exercise-card">
+        <span class="diff-badge diff-adv">Advanced</span>
+        <h4>Market Integration</h4>
+        <p>Test for cointegration between market pairs using the Engle-Granger method. Estimate the law of one price. Analyze how transport costs and borders affect price transmission.</p>
+        <div class="dataset-ref">Dataset: trade_markets</div>
+      </div>
+      <div class="exercise-card">
+        <span class="diff-badge diff-adv">Advanced</span>
+        <h4>Growth &amp; Development Regressions</h4>
+        <p>Estimate the relationship between GDP growth and poverty reduction. Test convergence across countries. Use fixed effects to control for unobserved country heterogeneity.</p>
+        <div class="dataset-ref">Dataset: panel_data</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p><strong>devdata-practice</strong> &middot; Realistic practice data for development economics</p>
+    <p>
+      <a href="https://github.com/Varnasr/devdata-practice" target="_blank">GitHub Repository</a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://varnasr.github.io/deveconomics-toolkit/" target="_blank">DevEconomics Toolkit</a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://impactmojo.in" target="_blank">Impact Mojo</a>
+      &nbsp;&middot;&nbsp;
+      MIT License
+    </p>
+    <p style="margin-top: 16px;">&copy; 2026 Impact Mojo. Open source under the MIT License.</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  var STORAGE_KEY = 'devdata-theme';
+  var buttons = document.querySelectorAll('.theme-btn');
+  var body = document.body;
+  function getSystemTheme() { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+  function applyTheme(setting) {
+    var resolved = setting === 'system' ? getSystemTheme() : setting;
+    if (resolved === 'dark') body.classList.add('dark-mode'); else body.classList.remove('dark-mode');
+    buttons.forEach(function(btn) { btn.classList.toggle('active', btn.getAttribute('data-theme') === setting); });
+  }
+  var saved = localStorage.getItem(STORAGE_KEY) || 'system';
+  applyTheme(saved);
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var theme = btn.getAttribute('data-theme');
+      localStorage.setItem(STORAGE_KEY, theme);
+      applyTheme(theme);
+    });
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+    if (localStorage.getItem(STORAGE_KEY) === 'system') applyTheme('system');
+  });
+  var toggle = document.getElementById('mobileToggle');
+  var navLinks = document.getElementById('navLinks');
+  if (toggle && navLinks) toggle.addEventListener('click', function() { navLinks.classList.toggle('open'); });
+})();
+</script>
+
+</body>
+</html>

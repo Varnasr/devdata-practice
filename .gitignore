@@ -1,0 +1,11 @@
+output/
+*.csv
+*.parquet
+__pycache__/
+*.pyc
+.venv/
+.env
+*.egg-info/
+dist/
+build/
+.DS_Store
