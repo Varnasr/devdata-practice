@@ -152,6 +152,91 @@ GENERATORS = {
         "default_size": 15000,
         "description": "Governance & accountability (service delivery, corruption, trust)",
     },
+    # ── Cross-cutting & methodological generators ──
+    "behaviour_change": {
+        "module": "generators.behaviour_change",
+        "size_param": "n_individuals",
+        "default_size": 20000,
+        "description": "BCC / KAP survey (knowledge, attitude, practice, campaign effects)",
+    },
+    "cost_effectiveness": {
+        "module": "generators.cost_effectiveness",
+        "size_param": "n_programmes",
+        "default_size": 15000,
+        "description": "Programme costing & CEA (costs, outcomes, ICER, DALY, QALY)",
+    },
+    "decent_work": {
+        "module": "generators.decent_work",
+        "size_param": "n_workers",
+        "default_size": 25000,
+        "description": "ILO decent work (formal/informal, earnings, protection, unions)",
+    },
+    "care_economy": {
+        "module": "generators.care_economy",
+        "size_param": "n_individuals",
+        "default_size": 20000,
+        "description": "Unpaid care & time use (diary data, gender gap, time poverty)",
+    },
+    "intersectionality": {
+        "module": "generators.intersectionality",
+        "size_param": "n_individuals",
+        "default_size": 25000,
+        "description": "Intersectional inequality (caste, gender, disability, outcomes)",
+    },
+    "environmental_justice": {
+        "module": "generators.environmental_justice",
+        "size_param": "n_households",
+        "default_size": 20000,
+        "description": "Environmental justice (pollution, health, climate vulnerability)",
+    },
+    "community_development": {
+        "module": "generators.community_development",
+        "size_param": "n_individuals",
+        "default_size": 18000,
+        "description": "Social capital & collective action (trust, CDD, participation)",
+    },
+    "digital_access": {
+        "module": "generators.digital_access",
+        "size_param": "n_individuals",
+        "default_size": 20000,
+        "description": "Digital divide (access, literacy, misinformation, privacy)",
+    },
+    "social_emotional_learning": {
+        "module": "generators.social_emotional_learning",
+        "size_param": "n_students",
+        "default_size": 15000,
+        "description": "Youth SEL (5 CASEL domains, wellbeing, behaviour, academics)",
+    },
+    "ngo_finance": {
+        "module": "generators.ngo_finance",
+        "size_param": "n_programmes",
+        "default_size": 10000,
+        "description": "NGO programme finance (budgets, donors, VfM, compliance)",
+    },
+    "aid_effectiveness": {
+        "module": "generators.aid_effectiveness",
+        "size_param": "n_flows",
+        "default_size": 12000,
+        "description": "ODA & aid effectiveness (Paris Declaration, fragmentation, coordination)",
+    },
+    "media_development": {
+        "module": "generators.media_development",
+        "size_param": "n_individuals",
+        "default_size": 18000,
+        "description": "Media & information ecosystems (access, literacy, misinformation)",
+    },
+    "irt_assessment": {
+        "module": "generators.irt_assessment",
+        "size_param": "n_respondents",
+        "default_size": 20000,
+        "description": "IRT psychometric assessment (3PL model, 30 items, DIF, response time)",
+    },
+    "field_survey_quality": {
+        "module": "generators.field_survey_quality",
+        "size_param": "n_surveys",
+        "default_size": 20000,
+        "description": "Survey paradata & QC (timing, GPS, straightlining, back-checks)",
+    },
 }
 
 
