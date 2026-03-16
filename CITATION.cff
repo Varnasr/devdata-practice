@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: devdata-practice
+message: >-
+  If you use devdata-practice in your research or teaching,
+  please cite it using the metadata from this file.
+type: software
+authors:
+  - given-names: Varna
+    family-names: Sri Raman
+    alias: Varnasr
+repository-code: https://github.com/ImpactMojo/devdata-practice
+url: https://impactmojo.in
+abstract: >-
+  Realistic, large-scale practice datasets for development economics.
+  Includes 10 generators covering household surveys, RCTs, health,
+  education, agriculture, labor markets, microfinance, poverty targeting,
+  panel data, and market prices.
+keywords:
+  - development-economics
+  - datasets
+  - data-generators
+  - household-surveys
+  - randomized-controlled-trials
+  - practice-data
+  - python
+license: MIT
+version: 1.0.0
+date-released: 2025-01-01
