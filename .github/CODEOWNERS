@@ -1,0 +1,14 @@
+# Code owners for devdata-practice
+# These users will be automatically requested for review on PRs.
+
+# Default owner for the entire repo
+* @Varnasr
+
+# Generator modules
+/generators/ @Varnasr
+
+# Documentation
+/docs/ @Varnasr
+
+# GitHub configuration and CI
+/.github/ @Varnasr
