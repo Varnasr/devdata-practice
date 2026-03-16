@@ -9,3 +9,12 @@ __pycache__/
 dist/
 build/
 .DS_Store
+
+# Added by git standards propagation
+node_modules/
+Thumbs.db
+*.log
+coverage/
+.vscode/
+.idea/
+*.swp
