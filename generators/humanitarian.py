@@ -88,12 +88,12 @@ def generate(n_individuals: int = 18000, seed: int = 712) -> pd.DataFrame:
 
     months_displaced = np.where(
         displaced,
-        np.clip(rng.exponential(14), 0.5, 72).round(0).astype(int),
+        np.clip(rng.exponential(14, n), 0.5, 72).round(0).astype(int),
         0,
     )
     times_displaced = np.where(
         displaced,
-        np.clip(rng.poisson(1.5), 1, 6),
+        np.clip(rng.poisson(1.5, n), 1, 6),
         0,
     )
 
@@ -363,7 +363,7 @@ def generate(n_individuals: int = 18000, seed: int = 712) -> pd.DataFrame:
     )
     complaint_resolution_days = np.where(
         complaint_resolved,
-        np.clip(rng.exponential(12), 1, 60).astype(int),
+        np.clip(rng.exponential(12, n), 1, 60).astype(int),
         0,
     )
 

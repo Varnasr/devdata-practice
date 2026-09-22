@@ -1,4 +1,13 @@
-numpy>=1.24
-pandas>=2.0
-scipy>=1.10
-pyarrow>=12.0
+# Pinned deliberately. The maintenance policy asks that a clone still run years
+# from now, and an unpinned set on a repository nobody watches is a CI failure
+# waiting for a quiet week. These versions were resolved together and verified on
+# Python 3.11 with the full suite green.
+#
+# Raise them deliberately and together, then re-run `pytest tests/`. Do not let a
+# resolver do it silently: `pandas>=2.0` was how this repository would have picked
+# up pandas 3, where text columns get a `str` dtype rather than `object` and any
+# check keyed on `dtype == object` skips every text column without saying so.
+numpy==2.4.6
+pandas==3.0.6
+scipy==1.17.1
+pyarrow==25.0.1

@@ -57,7 +57,7 @@ def generate(n_children: int = 35000, seed: int = 789) -> pd.DataFrame:
         rng.normal(3.1 + 0.1 * (wealth_quintile - 1), 0.45, n), 1.0, 5.5
     )
     low_birth_weight = (birth_weight_kg < 2.5).astype(int)
-    birth_order = np.clip(rng.poisson(2), 1, 10)
+    birth_order = np.clip(rng.poisson(2, n), 1, 10)
 
     # --- Anthropometrics (WHO z-scores) ---
     # Height-for-age (stunting if < -2)

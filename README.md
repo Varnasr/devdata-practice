@@ -2,13 +2,15 @@
 
 [![Website](https://img.shields.io/badge/Docs-varnasr.github.io%2Fdevdata--practice-blue)](https://varnasr.github.io/devdata-practice/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/Varnasr/devdata-practice)](https://github.com/Varnasr/devdata-practice/commits/main)
 [![Part of ImpactMojo](https://img.shields.io/badge/Part%20of-ImpactMojo-orange)](https://www.impactmojo.in)
 
 **Realistic, large-scale practice datasets for development economics — 36 generators, 840,000+ rows.**
 
-Built for researchers, students, and practitioners who need real-feeling data modelled on DHS, NFHS, ASER, and other major development survey frameworks.
+Built for researchers, students and practitioners who need data shaped like a
+real survey: the same variables, the same awkward missingness, the same
+structure, without waiting on a data request.
 
 **Full documentation:** [varnasr.github.io/devdata-practice](https://varnasr.github.io/devdata-practice/)
 
@@ -16,7 +18,17 @@ Built for researchers, students, and practitioners who need real-feeling data mo
 
 ## About
 
-DevData Practice generates synthetic datasets that closely mirror the structure, variable distributions, and statistical properties of real development sector surveys. The data is designed for:
+DevData Practice generates synthetic datasets built to the *shape* of development
+sector surveys: the variables a DHS or LSMS instrument collects, laid out the way
+it lays them out, with realistic missingness, partial compliance and attrition.
+
+It does not reproduce any survey's distributions, and the figures it produces are
+not estimates of anything. A stunting rate here is a number the code was told to
+produce, not a measurement. If you need to check a pipeline against published
+figures, use a real recode and a published table. `TRUTH.md` says exactly which
+parameters are in the data and which estimand recovers each one.
+
+The data is designed for:
 
 - **Learning** — practice data analysis, MEL, and econometrics without needing access to restricted datasets
 - **Teaching** — ready-made datasets for classroom exercises, workshops, and tutorials
@@ -47,7 +59,8 @@ python generate.py --list
 python generate.py rct_experiment labor_market household_survey
 ```
 
-Generated files are saved to the `data/` directory as CSV files.
+Generated files are saved to `./output` as CSV files. Use `--output` to change
+the directory and `--format parquet` to change the format.
 
 ---
 
@@ -107,13 +120,55 @@ devdata-practice/
 ## Requirements
 
 ```
-pandas>=1.5.0
-numpy>=1.23.0
-scipy>=1.9.0
-faker>=15.0.0
+numpy==2.4.6
+pandas==3.0.6
+scipy==1.17.1
+pyarrow==25.0.1
 ```
 
-Python 3.9 or higher.
+Python 3.11 or higher. Versions are pinned exactly, not floored: see `CLAUDE.md`
+for why. `requirements-dev.txt` adds pytest.
+
+An earlier version of this section listed `faker>=15.0.0`. Nothing in the
+repository imports it.
+
+---
+
+## Checking your answer
+
+Every generator encodes parameters on purpose. `TRUTH.md` records what they are
+and which estimand recovers each one, so an exercise can be marked rather than
+guessed at.
+
+The one worth reading before you use `rct_experiment`: its intention-to-treat
+effect is **not** a fixed number. Take-up is drawn `U(0.65, 0.85)` for each arm on
+each run, so the ITT moved between +0.089 and +0.203 log points across five seeds.
+Only the complier effect is stable, and only when computed against the
+pure-control villages (`spillover_risk == 0`). Controls inside a treatment village
+receive a +3% spillover; using them as the comparison biases every ITT toward
+zero by about 0.011 log points, which is the lesson the design exists to teach.
+
+## Testing
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests/ -q          # 233 tests, about two minutes
+```
+
+CI runs the suite on Python 3.11 and 3.12, then writes every dataset to CSV and
+Parquet and checks the files are non-empty.
+
+The largest part of the suite is a guard against degenerate columns, and it exists
+because of a specific defect. `rng.binomial(1, 0.55)` without a size argument
+returns a *scalar*, which numpy broadcasts across the whole column: nothing
+raises, the row count is right, the file writes, and the variable is a constant.
+Nineteen call sites across nine generators were affected. Among the fifteen
+constant columns were four asset variables in `targeting`, a proxy-means-test
+dataset whose asset predictors did not vary, and the three dropout barriers in
+`girls_education`, all identically zero.
+
+It was invisible because CI ran `python generate.py --list`, which imports no
+generator at all. Thirty-six modules were unexecuted by any automated check.
 
 ---
 

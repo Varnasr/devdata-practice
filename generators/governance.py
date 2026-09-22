@@ -89,7 +89,7 @@ def generate(n_citizens: int = 15000, seed: int = 711) -> pd.DataFrame:
 
     # --- Information access ---
     knows_rti = rng.binomial(1, _logistic(0.15, 0.15 * educ_years / 10 + 0.1 * urban.astype(float), 0.4))
-    used_rti = np.where(knows_rti, rng.binomial(1, 0.12), 0)
+    used_rti = np.where(knows_rti, rng.binomial(1, 0.12, n), 0)
     gets_info_radio = rng.binomial(1, 0.55, n)
     gets_info_social_media = rng.binomial(1, _logistic(0.30, 0.2 * urban.astype(float) + 0.1 * (age < 35).astype(float), 0.4))
     gets_info_community_meeting = rng.binomial(1, 0.30 - 0.10 * urban.astype(float))

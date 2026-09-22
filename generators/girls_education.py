@@ -49,13 +49,14 @@ def generate(n_girls: int = 20000, seed: int = 702) -> pd.DataFrame:
     receives_school_meals = rng.binomial(1, 0.35, n)
     in_safe_spaces_programme = rng.binomial(1, 0.20, n)
 
-    # Distance to school
-    distance_km = np.clip(rng.exponential(2 if True else 5, n) + (0 if True else 3), 0.1, 15)
-    for i in range(n):
-        if urban[i]:
-            distance_km[i] = np.clip(rng.exponential(1.5), 0.1, 8)
-        else:
-            distance_km[i] = np.clip(rng.exponential(4), 0.3, 15)
+    # Distance to school. Rural girls travel further.
+    # Previously this drew a full vector through a dead `2 if True else 5`
+    # conditional, discarded it, then overwrote every element in a Python loop.
+    distance_km = np.where(
+        urban.astype(bool),
+        np.clip(rng.exponential(1.5, n), 0.1, 8),
+        np.clip(rng.exponential(4.0, n), 0.3, 15),
+    )
 
     # Safety
     feels_safe_route = rng.binomial(1, _logistic(0.60, ses + 0.3 * urban.astype(float) - 0.02 * distance_km, 0.3))
@@ -70,17 +71,32 @@ def generate(n_girls: int = 20000, seed: int = 702) -> pd.DataFrame:
                                      rng.binomial(1, _logistic(0.40, ses + 0.15 * receives_scholarship, 0.4)), 0)
     missed_school_menstruation = np.where(
         has_menstruated & ~has_sanitary_products.astype(bool),
-        rng.binomial(1, 0.55), 0
+        rng.binomial(1, 0.55, n), 0
     )
 
     # Enrollment & attendance
-    enrolled = rng.binomial(1, _logistic(
-        0.85,
+    #
+    # Schooling status is three-state, not two. A girl who never started school is
+    # not a dropout, and the policy response to the two is different: the first is
+    # an access problem, the second a retention problem. Modelling `dropped_out` as
+    # the complement of `enrolled` collapses them, and also made the two columns
+    # perfect aliases, so any model including both silently dropped a term.
+    ever_enrolled = rng.binomial(1, _logistic(
+        0.94,
+        ses + 0.20 * parent_values_girls_edu - 0.04 * distance_km
+        + 0.10 * urban.astype(float),
+        0.5
+    ))
+    # Retention among girls who did start.
+    stays_enrolled = rng.binomial(1, _logistic(
+        0.88,
         ses + 0.15 * receives_scholarship + 0.10 * parent_values_girls_edu
         - 0.03 * distance_km - 0.15 * (age >= 14).astype(float)
         + 0.08 * urban.astype(float),
         0.5
     ))
+    enrolled = (ever_enrolled.astype(bool) & stays_enrolled.astype(bool)).astype(int)
+    never_enrolled = (1 - ever_enrolled).astype(int)
     attendance_rate = np.where(enrolled,
         np.clip(
             rng.beta(6, 1.5, n)
@@ -103,13 +119,14 @@ def generate(n_girls: int = 20000, seed: int = 702) -> pd.DataFrame:
             + 4 * in_safe_spaces_programme + rng.normal(0, 10, n), 0, 100
         ).astype(int), np.nan)
 
-    # Dropout & barriers
-    dropped_out = (~enrolled.astype(bool)).astype(int)
-    barrier_marriage = np.where(dropped_out & (age >= 13), rng.binomial(1, 0.25), 0)
-    barrier_pregnancy = np.where(dropped_out & (age >= 14), rng.binomial(1, 0.12), 0)
+    # Dropout & barriers. A dropout started school and left; a never-enrolled girl
+    # is neither enrolled nor a dropout, so the two columns are no longer aliases.
+    dropped_out = (ever_enrolled.astype(bool) & ~enrolled.astype(bool)).astype(int)
+    barrier_marriage = np.where(dropped_out & (age >= 13), rng.binomial(1, 0.25, n), 0)
+    barrier_pregnancy = np.where(dropped_out & (age >= 14), rng.binomial(1, 0.12, n), 0)
     barrier_cost = np.where(dropped_out, rng.binomial(1, 0.35 - 0.10 * receives_scholarship), 0)
     barrier_distance = np.where(dropped_out, rng.binomial(1, np.clip(0.05 * distance_km, 0, 0.5)), 0)
-    barrier_household_chores = np.where(dropped_out, rng.binomial(1, 0.20), 0)
+    barrier_household_chores = np.where(dropped_out, rng.binomial(1, 0.20, n), 0)
 
     # Transition (primary grade 6 → secondary grade 7)
     at_transition = (grade == 6).astype(int)
@@ -141,6 +158,7 @@ def generate(n_girls: int = 20000, seed: int = 702) -> pd.DataFrame:
         "has_sanitary_products": has_sanitary_products,
         "missed_school_menstruation": missed_school_menstruation,
         "enrolled": enrolled,
+        "never_enrolled": never_enrolled,
         "attendance_rate": np.round(attendance_rate, 3),
         "math_score": math_score,
         "literacy_score": literacy_score,

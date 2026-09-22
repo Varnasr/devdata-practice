@@ -5,7 +5,9 @@ Simulates a multi-arm randomized controlled trial in a development context
 (e.g., cash transfer, school feeding, deworming).
 
 Realistic features:
-  • Stratified randomization by district and gender
+  • Two-level design: villages are randomised into treatment or pure-control,
+    then individuals within treatment villages are stratified-randomised by arm
+  • Stratified randomization by village and gender
   • Baseline and endline observations
   • Partial compliance (take-up < 100%)
   • Attrition correlated with treatment arm and baseline characteristics
@@ -43,19 +45,38 @@ def generate(n_individuals: int = 25000, seed: int = 123) -> pd.DataFrame:
         0, 27
     )
 
-    # --- Treatment assignment (stratified by district × gender) ---
-    arms = ["control", "cash_transfer", "cash_plus_training", "training_only"]
-    treatment = np.empty(n, dtype="<U20")
+    # --- Villages ---
+    # Individuals are clustered in villages within districts. This level exists so
+    # spillover exposure can vary: without it every district contained treated units
+    # by construction, and the spillover flag below was an exact alias of the control
+    # dummy (see tests/test_no_degenerate_columns.py, which now pins that down).
+    villages_per_district = 8
+    village_idx = rng.integers(0, villages_per_district, n)
+    village_id = np.array([f"{d}-V{v}" for d, v in zip(districts, village_idx)])
 
-    # Stratify assignment
-    strata = [f"{d}_{g}" for d, g in zip(districts, female)]
-    unique_strata = list(set(strata))
-    for s in unique_strata:
-        mask = np.array([x == s for x in strata])
-        n_s = mask.sum()
+    # --- Treatment assignment (two-level) ---
+    # 70% of villages are treatment villages; the remaining 30% are pure controls,
+    # where nobody is offered anything. Within a treatment village, individuals are
+    # stratified-randomised across the four arms by gender.
+    arms = ["control", "cash_transfer", "cash_plus_training", "training_only"]
+    treatment = np.full(n, "control", dtype="<U20")
+
+    all_villages = np.unique(village_id)
+    is_treatment_village = dict(
+        zip(all_villages, rng.binomial(1, 0.70, len(all_villages)).astype(bool))
+    )
+    village_is_treated = np.array([is_treatment_village[v] for v in village_id])
+
+    strata = np.array([f"{v}_{g}" for v, g in zip(village_id, female)])
+    for st in np.unique(strata[village_is_treated]):
+        mask = (strata == st) & village_is_treated
+        n_s = int(mask.sum())
         perm = rng.permutation(n_s)
-        arm_assign = np.array([arms[i % len(arms)] for i in perm])
-        treatment[mask] = arm_assign
+        treatment[mask] = np.array([arms[i % len(arms)] for i in perm])
+
+    # Control units living in a treatment village are exposed to spillovers;
+    # control units in pure-control villages are not.
+    exposed_control = (treatment == "control") & village_is_treated
 
     # --- Compliance (take-up) ---
     # Control: 0% take-up (by definition)
@@ -77,11 +98,20 @@ def generate(n_individuals: int = 25000, seed: int = 123) -> pd.DataFrame:
     het_female = 0.04 * female * actually_treated
     het_poor = 0.06 * (baseline_consumption < np.median(baseline_consumption)).astype(float) * actually_treated
 
+    # --- Spillover onto untreated neighbours ---
+    # Cash landing in a village lifts local demand, so untreated households in a
+    # treatment village gain a little even though they were offered nothing. The
+    # true spillover is +3% on consumption; see TRUTH.md. It is why an ITT computed
+    # against *all* controls is biased toward zero, and why the clean comparison is
+    # against pure-control villages only.
+    spillover_multiplier = np.where(exposed_control, 1.03, 1.0)
+
     # --- Endline outcome ---
     time_trend = 1.03  # 3% general improvement
     noise = np.exp(rng.normal(0, 0.15, n))
     endline_consumption = np.round(
-        baseline_consumption * time_trend * te_multiplier * (1 + het_female + het_poor) * noise, 2
+        baseline_consumption * time_trend * te_multiplier * spillover_multiplier
+        * (1 + het_female + het_poor) * noise, 2
     )
 
     # Endline food insecurity (should improve with treatment)
@@ -99,19 +129,21 @@ def generate(n_individuals: int = 25000, seed: int = 123) -> pd.DataFrame:
     attrition_prob -= 0.01 * (educ_years / 18)
     attrited = rng.binomial(1, np.clip(attrition_prob, 0.02, 0.25), n).astype(bool)
 
-    # --- Spillover flag (10% of control units in treated villages) ---
-    spillover_risk = np.zeros(n, dtype=int)
-    for d in np.unique(districts):
-        d_mask = districts == d
-        has_treated = (treatment[d_mask] != "control").any()
-        if has_treated:
-            ctrl = d_mask & (treatment == "control")
-            spillover_risk[ctrl] = 1
+    # --- Spillover exposure ---
+    # Share of each village actually offered treatment, and the exposure flag for
+    # control units sitting inside a treatment village. Controls in pure-control
+    # villages score 0 and are the clean comparison group; controls in treatment
+    # villages are the ones a spillover analysis has to worry about.
+    assigned = (treatment != "control").astype(float)
+    vs = pd.Series(assigned).groupby(pd.Series(village_id)).transform("mean")
+    village_treated_share = np.round(vs.to_numpy(), 4)
+    spillover_risk = exposed_control.astype(int)
 
     # Build DataFrame
     df = pd.DataFrame({
         "participant_id": ids,
         "district": districts,
+        "village_id": village_id,
         "urban": urban.astype(int),
         "female": female,
         "age": age,
@@ -124,6 +156,7 @@ def generate(n_individuals: int = 25000, seed: int = 123) -> pd.DataFrame:
         "endline_consumption_usd": np.where(attrited, np.nan, endline_consumption),
         "endline_food_insecurity": np.where(attrited, np.nan, endline_food_insecurity).astype(float),
         "attrited": attrited.astype(int),
+        "village_treated_share": village_treated_share,
         "spillover_risk": spillover_risk,
     })
 
