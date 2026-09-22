@@ -115,7 +115,7 @@ def generate(n_individuals: int = 18000, seed: int = 812) -> pd.DataFrame:
     )
     found_dev_content_useful = np.where(
         exposed_to_dev_content,
-        rng.binomial(1, 0.65),
+        rng.binomial(1, 0.65, n),
         0
     )
 
@@ -132,7 +132,7 @@ def generate(n_individuals: int = 18000, seed: int = 812) -> pd.DataFrame:
     ))
     corrected_by_others = np.where(
         shared_misinformation,
-        rng.binomial(1, 0.30),
+        rng.binomial(1, 0.30, n),
         0
     )
 
@@ -154,7 +154,7 @@ def generate(n_individuals: int = 18000, seed: int = 812) -> pd.DataFrame:
     in_media_literacy_programme = rng.binomial(1, 0.12, n)
     programme_improved_skills = np.where(
         in_media_literacy_programme,
-        rng.binomial(1, 0.70),
+        rng.binomial(1, 0.70, n),
         0
     )
 

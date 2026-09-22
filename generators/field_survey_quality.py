@@ -178,7 +178,7 @@ def generate(n_surveys: int = 20000, seed: int = 814) -> pd.DataFrame:
     # --- Supervisor checks ---
     field_spot_checked = rng.binomial(1, 0.10, n)
     audio_recorded = rng.binomial(1, 0.25, n)
-    audio_reviewed = np.where(audio_recorded, rng.binomial(1, 0.40), 0)
+    audio_reviewed = np.where(audio_recorded, rng.binomial(1, 0.40, n), 0)
 
     # --- Data quality metrics ---
     missing_rate = np.where(

@@ -7,20 +7,63 @@ on:
     branches: [main]
 
 jobs:
-  validate:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v6
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
+          cache: pip
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements-dev.txt
 
-      - name: List available generators
+      # This used to be the entire job. `--list` imports no generator, so all 36
+      # modules were unexecuted by CI and a broken one would have gone unnoticed.
+      - name: Registry lists cleanly
         run: python generate.py --list
 
+      - name: Test suite
+        run: python -m pytest tests/ -q
+
+  end_to_end:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      # Writing the files is a separate failure surface from generating the
+      # frames: a column dtype that a frame holds happily can still fail to
+      # serialise, and parquet is stricter than csv about mixed types.
+      - name: Generate every dataset to CSV
+        run: python generate.py --rows 500 --output /tmp/out-csv
+
+      - name: Generate every dataset to Parquet
+        run: python generate.py --rows 500 --format parquet --output /tmp/out-parquet
+
+      - name: Every registered dataset produced a file
+        run: |
+          python - <<'PY'
+          import pathlib, sys
+          from generate import GENERATORS
+          missing = []
+          for fmt, d in (("csv", "/tmp/out-csv"), ("parquet", "/tmp/out-parquet")):
+              for name in GENERATORS:
+                  p = pathlib.Path(d) / f"{name}.{fmt}"
+                  if not p.exists() or p.stat().st_size == 0:
+                      missing.append(str(p))
+          if missing:
+              sys.exit("missing or empty outputs:\n  " + "\n  ".join(missing))
+          print(f"PASS - {len(GENERATORS)} datasets written in both formats")
+          PY

@@ -158,15 +158,30 @@ def generate(n_individuals: int = 20000, seed: int = 501) -> pd.DataFrame:
     # ------------------------------------------------------------------ #
     # Mental health — PHQ-9-like score (0-27)
     # ------------------------------------------------------------------ #
-    # 9 items scored 0-3, correlated with poverty, female, shocks
+    # Built the way the instrument is: nine items each scored 0-3, summed to 0-27.
+    # The previous version mapped one latent normal through 9 * logistic(...) * 3,
+    # a bounded transform with no item-level variance. It could not reach either end
+    # of the scale: the floor sat at 2 and `depression_severe` (>= 20) was identically
+    # zero in every draw, so the severe-screening column carried no information at all.
+    #
+    # Item severities are spaced so a person on the latent mean endorses the common
+    # items (low mood, low energy) and not the rare ones (psychomotor change,
+    # self-harm ideation), which is what produces the strong floor real PHQ-9 data has.
+    # These are design targets for a synthetic teaching dataset, not estimates from a
+    # named survey: ~14.5% at or above the >= 10 moderate threshold and ~1.5% at or
+    # above the >= 20 severe threshold, within the broad range general-population
+    # screening reports. Verified by tests/test_calibration.py.
     phq9_latent = (
-        -0.3
-        - 0.25 * (wealth_quintile - 3) / 2
-        + 0.3 * female
-        + 0.01 * np.maximum(age - 50, 0)
-        + rng.normal(0, 0.8, n)
+        -0.35 * (wealth_quintile - 3) / 2
+        + 0.45 * female
+        + 0.015 * np.maximum(age - 50, 0)
+        + rng.normal(0, 1.45, n)
     )
-    phq9_score = np.clip(np.round(9 * _logistic(0.33, phq9_latent, 0.6) * 3), 0, 27).astype(int)
+    # Item severity thresholds, easiest (most endorsed) first.
+    item_severity = np.array([1.5, 1.7, 1.9, 2.1, 2.4, 2.7, 3.0, 3.4, 4.2])
+    item_p = 1.0 / (1.0 + np.exp(-(phq9_latent[:, None] - item_severity[None, :])))
+    phq9_items = rng.binomial(3, item_p)          # n x 9, each item 0-3
+    phq9_score = phq9_items.sum(axis=1).astype(int)
     depression_moderate = (phq9_score >= 10).astype(int)
     depression_severe = (phq9_score >= 20).astype(int)
 

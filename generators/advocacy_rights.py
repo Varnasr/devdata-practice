@@ -42,7 +42,7 @@ def generate(n_individuals: int = 15000, seed: int = 708) -> pd.DataFrame:
     # Land tenure
     owns_land = rng.binomial(1, _logistic(0.35, wealth - 0.1 * female, 0.3))
     has_land_title = np.where(owns_land, rng.binomial(1, _logistic(0.25, wealth + 0.1 * urban.astype(float), 0.4)), 0)
-    land_dispute_experienced = np.where(owns_land, rng.binomial(1, 0.15), 0)
+    land_dispute_experienced = np.where(owns_land, rng.binomial(1, 0.15, n), 0)
 
     # Programme participation
     received_legal_aid = rng.binomial(1, 0.18, n)
@@ -77,17 +77,17 @@ def generate(n_individuals: int = 15000, seed: int = 708) -> pd.DataFrame:
     dispute_resolved = np.where(sought_resolution.astype(bool),
         rng.binomial(1, 0.55 + 0.10 * received_legal_aid), 0)
     satisfied_with_outcome = np.where(dispute_resolved.astype(bool),
-        rng.binomial(1, 0.60), 0)
+        rng.binomial(1, 0.60, n), 0)
 
     # Access to justice barriers
     barrier_cost = np.where(experienced_dispute & ~sought_resolution.astype(bool),
-        rng.binomial(1, 0.40), 0)
+        rng.binomial(1, 0.40, n), 0)
     barrier_distance = np.where(experienced_dispute & ~sought_resolution.astype(bool),
-        rng.binomial(1, 0.25), 0)
+        rng.binomial(1, 0.25, n), 0)
     barrier_fear = np.where(experienced_dispute & ~sought_resolution.astype(bool),
-        rng.binomial(1, 0.30), 0)
+        rng.binomial(1, 0.30, n), 0)
     barrier_distrust = np.where(experienced_dispute & ~sought_resolution.astype(bool),
-        rng.binomial(1, 0.20), 0)
+        rng.binomial(1, 0.20, n), 0)
 
     # Civic participation
     voted_last_election = rng.binomial(1, _logistic(0.55, 0.05 * (age > 18).astype(float) + 0.1 * educ_years / 10, 0.3))

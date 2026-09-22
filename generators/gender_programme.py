@@ -99,7 +99,7 @@ def generate(n_individuals: int = 25000, seed: int = 701) -> pd.DataFrame:
     )
     unmet_need_fp = np.where(
         married & (age >= 15) & (age <= 49) & ~using_contraception.astype(bool),
-        rng.binomial(1, 0.22), 0
+        rng.binomial(1, 0.22, n), 0
     )
 
     # --- Empowerment composite (WEAI-like, 0-1) ---

@@ -72,7 +72,7 @@ def generate(n_households: int = 20000, seed: int = 710) -> pd.DataFrame:
     has_conditionality = np.isin(programme_type, ["conditional_cash", "cash_plus", "school_feeding"])
     cond_health_visits = np.where(has_conditionality, rng.binomial(1, 0.72 + 0.05 * head_educ / 18), 0)
     cond_school_attendance = np.where(has_conditionality & (n_children > 0),
-                                      rng.binomial(1, 0.78), 0)
+                                      rng.binomial(1, 0.78, n), 0)
     compliant = np.where(has_conditionality,
                          cond_health_visits | cond_school_attendance, 1)
 

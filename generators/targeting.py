@@ -32,7 +32,7 @@ def generate(n_households: int = 20000, seed: int = 505) -> pd.DataFrame:
     hh_size = rng.choice(range(1, 11), n,
                          p=[0.03, 0.06, 0.10, 0.16, 0.20, 0.18, 0.13, 0.08, 0.04, 0.02])
     n_children = np.clip(rng.poisson(hh_size * 0.35), 0, hh_size - 1)
-    n_elderly = np.clip(rng.poisson(0.3), 0, min(3, max(0, hh_size.max())))
+    n_elderly = np.clip(rng.poisson(0.3, n), 0, min(3, max(0, hh_size.max())))
     n_elderly = np.minimum(n_elderly, hh_size - n_children)
     head_female = rng.binomial(1, 0.28, n)
     head_age = rng.integers(20, 75, n)
@@ -43,16 +43,16 @@ def generate(n_households: int = 20000, seed: int = 505) -> pd.DataFrame:
     # Housing
     wall_permanent = rng.binomial(1, 0.35 + 0.15 * urban.astype(float))
     roof_permanent = rng.binomial(1, 0.40 + 0.15 * urban.astype(float))
-    rooms = np.clip(rng.poisson(2), 1, 8)
+    rooms = np.clip(rng.poisson(2, n), 1, 8)
     has_electricity = rng.binomial(1, 0.30 + 0.30 * urban.astype(float))
     has_piped_water = rng.binomial(1, 0.20 + 0.25 * urban.astype(float))
     has_flush_toilet = rng.binomial(1, 0.15 + 0.20 * urban.astype(float))
 
     # Assets
-    owns_radio = rng.binomial(1, 0.55)
+    owns_radio = rng.binomial(1, 0.55, n)
     owns_tv = rng.binomial(1, 0.25 + 0.15 * urban.astype(float))
-    owns_mobile = rng.binomial(1, 0.70)
-    owns_bicycle = rng.binomial(1, 0.35)
+    owns_mobile = rng.binomial(1, 0.70, n)
+    owns_bicycle = rng.binomial(1, 0.35, n)
     owns_motorcycle = rng.binomial(1, 0.10 + 0.05 * urban.astype(float))
     owns_land = rng.binomial(1, 0.55 - 0.20 * urban.astype(float))
     land_acres = np.where(owns_land, np.clip(rng.lognormal(0.5, 0.8, n), 0.1, 20), 0)
