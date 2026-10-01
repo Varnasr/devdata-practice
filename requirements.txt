@@ -9,5 +9,5 @@
 # check keyed on `dtype == object` skips every text column without saying so.
 numpy==2.4.6
 pandas==3.0.6
-scipy==1.17.1
+scipy==1.18.1
 pyarrow==25.0.1
