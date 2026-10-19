@@ -1,5 +1,7 @@
 # devdata-practice
 
+Shared engineering standard: @.claude/engineering-standards.md. It applies to all work in this repository. This file adds what is specific to the project, and wins where the two disagree.
+
 Synthetic datasets for practising development economics analysis. Thirty-six
 generators, pure Python, no service dependencies, nothing fetched at runtime.
 
