@@ -199,3 +199,5 @@ GitHub. https://github.com/Varnasr/devdata-practice
 ```
 
 Or use the [CITATION.cff](CITATION.cff) file.
+
+Need help setting out your story, what sets your work apart, the context, the return on investment and the projections? Pinpoint Ventures can help. Write to [hello@pinpointventures.in](mailto:hello@pinpointventures.in?subject=Enquiry%20from%20github.com/Varnasr/devdata-practice) or message on [WhatsApp](https://wa.me/919871777110?text=Hi%20Pinpoint%20Ventures%2C%20I%20found%20you%20through%20github.com/Varnasr/devdata-practice.%20I%27d%20like%20to%20discuss%20a%20research%20or%20advisory%20engagement.).
