@@ -97,7 +97,8 @@ test to apply is whether the result becomes a column.
 
 ## Testing
 
-`.github/workflows/ci.yml` runs the suite on 3.11 and 3.12, plus an end-to-end
+`.github/workflows/ci.yml` runs the suite on 3.12 (3.11 was dropped on 2 November 2026, when numpy 2.5 and
+scipy 1.18 stopped publishing 3.11 wheels), plus an end-to-end
 job that writes every dataset to CSV and Parquet and checks the files are
 non-empty. Serialisation is a separate failure surface from generation: parquet
 is stricter than csv about mixed types, so a frame that builds happily can still

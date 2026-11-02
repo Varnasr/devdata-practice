@@ -1,7 +1,9 @@
 # Pinned deliberately. The maintenance policy asks that a clone still run years
 # from now, and an unpinned set on a repository nobody watches is a CI failure
 # waiting for a quiet week. These versions were resolved together and verified on
-# Python 3.11 with the full suite green.
+# Python 3.11 and 3.12 with the full suite green. From 2 November 2026 CI runs
+# 3.12 only: numpy 2.5 and scipy 1.18 publish no Python 3.11 wheel, so a bump of
+# either could not install on 3.11.
 #
 # Raise them deliberately and together, then re-run `pytest tests/`. Do not let a
 # resolver do it silently: `pandas>=2.0` was how this repository would have picked

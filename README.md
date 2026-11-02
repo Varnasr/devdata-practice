@@ -2,7 +2,7 @@
 
 [![Website](https://img.shields.io/badge/Docs-varnasr.github.io%2Fdevdata--practice-blue)](https://varnasr.github.io/devdata-practice/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
+[![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue)](https://www.python.org/)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/Varnasr/devdata-practice)](https://github.com/Varnasr/devdata-practice/commits/main)
 [![Part of ImpactMojo](https://img.shields.io/badge/Part%20of-ImpactMojo-orange)](https://www.impactmojo.in)
 
@@ -126,7 +126,8 @@ scipy==1.17.1
 pyarrow==25.0.1
 ```
 
-Python 3.11 or higher. Versions are pinned exactly, not floored: see `CLAUDE.md`
+Python 3.12 or higher (the pinned versions from before 2 November 2026 also pass on
+3.11, but later numpy and scipy releases do not install there). Versions are pinned exactly, not floored: see `CLAUDE.md`
 for why. `requirements-dev.txt` adds pytest.
 
 An earlier version of this section listed `faker>=15.0.0`. Nothing in the
@@ -155,7 +156,7 @@ pip install -r requirements-dev.txt
 python -m pytest tests/ -q          # 233 tests, about two minutes
 ```
 
-CI runs the suite on Python 3.11 and 3.12, then writes every dataset to CSV and
+CI runs the suite on Python 3.12, then writes every dataset to CSV and
 Parquet and checks the files are non-empty.
 
 The largest part of the suite is a guard against degenerate columns, and it exists
